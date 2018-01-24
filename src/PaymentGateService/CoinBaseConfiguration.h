@@ -1,36 +1,36 @@
-// Copyright (c) 2015-2016, The Forknote developers
+// Copyright (c) 2015-2016, The Spot developers
 //
-// This file is part of Forknote.
+// This file is part of Spot.
 //
-// Forknote is free software: you can redistribute it and/or modify
+// Spot is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Forknote is distributed in the hope that it will be useful,
+// Spot is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Forknote.  If not, see <http://www.gnu.org/licenses/>.
+// along with Spot.  If not, see <http://www.gnu.org/licenses/>.
 
-// Copyright (c) 2016, The Forknote developers
+// Copyright (c) 2016, The Spot developers
 //
-// This file is part of Forknote.
+// This file is part of Spot.
 //
-// Forknote is free software: you can redistribute it and/or modify
+// Spot is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Forknote is distributed in the hope that it will be useful,
+// Spot is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Forknote.  If not, see <http://www.gnu.org/licenses/>.
+// along with Spot.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -53,15 +53,18 @@ public:
   std::string GENESIS_COINBASE_TX_HEX;
   uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX;
   uint64_t MONEY_SUPPLY;
+  uint32_t BUGGED_ZAWY_DIFFICULTY_BLOCK_INDEX;
   uint32_t ZAWY_DIFFICULTY_BLOCK_INDEX;
   size_t ZAWY_DIFFICULTY_V2;
-  size_t ZAWY_DIFFICULTY_V3;
-  size_t ZAWY_DIFFICULTY_V4;
+  uint8_t ZAWY_DIFFICULTY_DIFFICULTY_BLOCK_VERSION;
   uint64_t GENESIS_BLOCK_REWARD;
   size_t CRYPTONOTE_COIN_VERSION;
   uint64_t TAIL_EMISSION_REWARD;
   uint32_t KILL_HEIGHT;
   uint32_t MANDATORY_TRANSACTION;
+  uint32_t MIXIN_START_HEIGHT;
+  uint16_t MIN_MIXIN;
+  uint8_t MANDATORY_MIXIN_BLOCK_VERSION;
   unsigned int EMISSION_SPEED_FACTOR;
   size_t CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
   size_t CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
