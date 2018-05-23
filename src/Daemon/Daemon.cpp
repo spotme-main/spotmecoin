@@ -51,6 +51,9 @@
 
 #if defined(WIN32)
 #include <crtdbg.h>
+#include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 using Common::JsonValue;
@@ -86,6 +89,7 @@ namespace
   const command_line::arg_descriptor<uint64_t>    arg_EXPECTED_NUMBER_OF_BLOCKS_PER_DAY  = {"EXPECTED_NUMBER_OF_BLOCKS_PER_DAY", "uint64_t"};
   const command_line::arg_descriptor<uint32_t>    arg_UPGRADE_HEIGHT_V2  = {"UPGRADE_HEIGHT_V2", "uint32_t", 0};
   const command_line::arg_descriptor<uint32_t>    arg_UPGRADE_HEIGHT_V3  = {"UPGRADE_HEIGHT_V3", "uint32_t", 0};
+  const command_line::arg_descriptor<uint32_t>    arg_UPGRADE_HEIGHT_V4 = { "UPGRADE_HEIGHT_V4", "uint32_t", 0};
   const command_line::arg_descriptor<uint32_t>    arg_KEY_IMAGE_CHECKING_BLOCK_INDEX  = {"KEY_IMAGE_CHECKING_BLOCK_INDEX", "uint32_t", 0};
   const command_line::arg_descriptor<size_t>      arg_DIFFICULTY_WINDOW_V1  = {"DIFFICULTY_WINDOW_V1", "size_t", 0};
   const command_line::arg_descriptor<size_t>      arg_DIFFICULTY_WINDOW_V2  = {"DIFFICULTY_WINDOW_V2", "size_t", 0};
@@ -164,7 +168,11 @@ void print_genesis_tx_hex(const po::variables_map& vm, LoggerManager& logManager
     if (command_line::has_arg(vm, arg_UPGRADE_HEIGHT_V3) && command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V3) != 0)
     {
       currencyBuilder.upgradeHeightV3(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V3));
-    }
+	} 
+	if (command_line::has_arg(vm, arg_UPGRADE_HEIGHT_V4) && command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4) != 0)
+	{
+		currencyBuilder.upgradeHeightV4(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4));
+	}
     if (command_line::has_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX) && command_line::get_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX) != 0)
     {
       currencyBuilder.keyImageCheckingBlockIndex(command_line::get_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX));
@@ -242,6 +250,10 @@ void print_genesis_tx_hex(const po::variables_map& vm, LoggerManager& logManager
   {
     currencyBuilder.upgradeHeightV3(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V3));
   }
+  if (command_line::has_arg(vm, arg_UPGRADE_HEIGHT_V4) && command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4) != 0)
+  {
+	  currencyBuilder.upgradeHeightV4(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4));
+  }
   currencyBuilder.difficultyLag(command_line::get_arg(vm, arg_DIFFICULTY_LAG));
   currencyBuilder.difficultyCut(command_line::get_arg(vm, arg_DIFFICULTY_CUT));
   if (command_line::has_arg(vm, arg_DIFFICULTY_WINDOW_V1) && command_line::get_arg(vm, arg_DIFFICULTY_WINDOW_V1) != 0)
@@ -283,6 +295,24 @@ JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   consoleLogger.insert("pattern", "%D %T %L ");
 
   return loggerConfiguration;
+}
+//ADDED.. may need to remove
+
+/* Wait for input so users can read errors before the window closes if they
+   launch from a GUI rather than a terminal */
+void pause_for_input(int argc) {
+  /* if they passed arguments they're probably in a terminal so the errors will
+     stay visible */
+  if (argc == 1) {
+    #if defined(WIN32)
+    if (_isatty(_fileno(stdout)) && _isatty(_fileno(stdin))) {
+    #else
+    if(isatty(fileno(stdout)) && isatty(fileno(stdin))) {
+    #endif
+      std::cout << "Press any key to close the program: ";
+      getchar();
+    }
+  }
 }
 
 int main(int argc, char* argv[])
@@ -327,6 +357,7 @@ int main(int argc, char* argv[])
     command_line::add_arg(desc_cmd_sett, arg_EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);
     command_line::add_arg(desc_cmd_sett, arg_UPGRADE_HEIGHT_V2);
     command_line::add_arg(desc_cmd_sett, arg_UPGRADE_HEIGHT_V3);
+	command_line::add_arg(desc_cmd_sett, arg_UPGRADE_HEIGHT_V4);
     command_line::add_arg(desc_cmd_sett, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX);
     command_line::add_arg(desc_cmd_sett, arg_DIFFICULTY_WINDOW_V1);
     command_line::add_arg(desc_cmd_sett, arg_DIFFICULTY_WINDOW_V2);
@@ -412,7 +443,7 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
 
     if (!r)
       return 1;
-  
+
     auto modulePath = Common::NativePathToGeneric(argv[0]);
     auto cfgLogFile = Common::NativePathToGeneric(command_line::get_arg(vm, arg_log_file));
 
@@ -452,7 +483,7 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
   } else {
     currencyBuilder.mandatoryMixinBlockVersion(command_line::get_arg(vm, arg_MANDATORY_MIXIN_BLOCK_VERSION) - '0');
   }
-  currencyBuilder.mandatoryTransaction(command_line::get_arg(vm, arg_MANDATORY_TRANSACTION));
+    currencyBuilder.mandatoryTransaction(command_line::get_arg(vm, arg_MANDATORY_TRANSACTION));
     currencyBuilder.genesisCoinbaseTxHex(command_line::get_arg(vm, arg_GENESIS_COINBASE_TX_HEX));
     currencyBuilder.publicAddressBase58Prefix(command_line::get_arg(vm, arg_CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX));
     currencyBuilder.moneySupply(command_line::get_arg(vm, arg_MONEY_SUPPLY));
@@ -490,6 +521,10 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
     {
       currencyBuilder.upgradeHeightV3(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V3));
     }
+	if (command_line::has_arg(vm, arg_UPGRADE_HEIGHT_V4) && command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4) != 0)
+	{
+		currencyBuilder.upgradeHeightV4(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4));
+	}
     if (command_line::has_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX) && command_line::get_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX) != 0)
     {
       currencyBuilder.keyImageCheckingBlockIndex(command_line::get_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX));
@@ -526,7 +561,9 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
       currencyBuilder.zawyDifficultyBlockVersion(command_line::get_arg(vm, arg_ZAWY_DIFFICULTY_BLOCK_VERSION) - '0');
     }
     currencyBuilder.buggedZawyDifficultyBlockIndex(command_line::get_arg(vm, arg_BUGGED_ZAWY_DIFFICULTY_BLOCK_INDEX));
-    currencyBuilder.testnet(testnet_mode);
+
+    
+	currencyBuilder.testnet(testnet_mode);
     try {
       currencyBuilder.currency();
     } catch (std::exception&) {
@@ -618,7 +655,8 @@ for (const auto& cp : checkpoint_input) {
     CryptoNote::RpcServer rpcServer(dispatcher, logManager, ccore, p2psrv, cprotocol);
 
     cprotocol.set_p2p_endpoint(&p2psrv);
-    DaemonCommandsHandler dch(ccore, p2psrv, logManager);
+    //DaemonCommandsHandler dch(ccore, p2psrv, logManager);
+	DaemonCommandsHandler dch(ccore, p2psrv, logManager, &rpcServer);
     logger(INFO) << "Initializing p2p server...";
     if (!p2psrv.init(netNodeConfig)) {
       logger(ERROR, BRIGHT_RED) << "Failed to initialize p2p server.";

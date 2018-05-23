@@ -136,7 +136,7 @@ CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, S
   m_observedHeight(0),
   m_peersCount(0),
   logger(log, "protocol") {
-  
+
   if (!m_p2p) {
     m_p2p = &m_p2p_stub;
   }
@@ -181,7 +181,7 @@ void CryptoNoteProtocolHandler::onConnectionClosed(CryptoNoteConnectionContext& 
 void CryptoNoteProtocolHandler::stop() {
   m_stop = true;
 }
-    
+
 bool CryptoNoteProtocolHandler::start_sync(CryptoNoteConnectionContext& context) {
   logger(Logging::TRACE) << context << "Starting synchronization";
 
@@ -206,13 +206,13 @@ void CryptoNoteProtocolHandler::log_connections() {
   std::stringstream ss;
 
   ss << std::setw(25) << std::left << "Remote Host"
-    << std::setw(20) << "Peer id"
+    << std::setw(20) << "Peer ID"
     << std::setw(25) << "Recv/Sent (inactive,sec)"
     << std::setw(25) << "State"
     << std::setw(20) << "Lifetime(seconds)" << ENDL;
 
   m_p2p->for_each_connection([&](const CryptoNoteConnectionContext& cntxt, PeerIdType peer_id) {
-    ss << std::setw(25) << std::left << std::string(cntxt.m_is_income ? "[INC]" : "[OUT]") +
+    ss << std::setw(25) << std::left << std::string(cntxt.m_is_income ? "[INCOMING]" : "[OUTGOING]") +
       Common::ipAddressToString(cntxt.m_remote_ip) + ":" + std::to_string(cntxt.m_remote_port)
       << std::setw(20) << std::hex << peer_id
       // << std::setw(25) << std::to_string(cntxt.m_recv_cnt) + "(" + std::to_string(time(NULL) - cntxt.m_last_recv) + ")" + "/" + std::to_string(cntxt.m_send_cnt) + "(" + std::to_string(time(NULL) - cntxt.m_last_send) + ")"
@@ -241,10 +241,11 @@ bool CryptoNoteProtocolHandler::process_payload_sync_data(const CORE_SYNC_DATA& 
   } else {
     int64_t diff = static_cast<int64_t>(hshd.current_height) - static_cast<int64_t>(get_current_blockchain_height());
 
-    logger(diff >= 0 ? (is_inital ? Logging::INFO : Logging::DEBUGGING) : Logging::TRACE, Logging::BRIGHT_YELLOW) << context <<
-      "Sync data returned unknown top block: " << get_current_blockchain_height() << " -> " << hshd.current_height
-      << " [" << std::abs(diff) << " blocks (" << std::abs(diff) / (24 * 60 * 60 / m_currency.difficultyTarget()) << " days) "
-      << (diff >= 0 ? std::string("behind") : std::string("ahead")) << "] " << std::endl << "SYNCHRONIZATION started";
+    logger(diff >= 0 ? (is_inital ? Logging::INFO : Logging::DEBUGGING) : Logging::TRACE, Logging::BRIGHT_GREEN) << context <<
+      "Your SPOTme Coin node is syncing with the network. You are "
+      // << get_current_blockchain_height() << " -> " << hshd.current_height
+      << std::abs(diff) << " blocks (" << std::abs(diff) / (24 * 60 * 60 / m_currency.difficultyTarget()) << " days) "
+      << (diff >= 0 ? std::string("behind") : std::string("ahead of")) << " main network " << std::endl << "SPOTme Coin is now syncing with the network";
 
     logger(Logging::DEBUGGING) << "Remote top block height: " << hshd.current_height << ", id: " << hshd.top_id;
     //let the socket to send response to handshake, but request callback, to let send request data after response
@@ -356,7 +357,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_transactions(int command, NOTIF
 
   for (auto tx_blob_it = arg.txs.begin(); tx_blob_it != arg.txs.end();) {
     if (!m_core.addTransactionToPool(*tx_blob_it)) {
-      logger(Logging::INFO) << context << "Tx verification failed";
+      logger(Logging::INFO) << context << "Transaction already known. No need to verify";
       tx_blob_it = arg.txs.erase(tx_blob_it);
     } else {
       ++tx_blob_it;
@@ -572,7 +573,7 @@ bool CryptoNoteProtocolHandler::request_missing_objects(CryptoNoteConnectionCont
     requestMissingPoolTransactions(context);
 
     context.m_state = CryptoNoteConnectionContext::state_normal;
-    logger(Logging::INFO, Logging::BRIGHT_GREEN) << context << "SYNCHRONIZED OK";
+    logger(Logging::INFO, Logging::BRIGHT_GREEN) << context << "READY PLAYER ONE.  You are now SYNCHRONIZED with SPOTme Coin network.  Welcome to the Jungle.";
     on_connection_synchronized();
   }
   return true;
@@ -582,10 +583,10 @@ bool CryptoNoteProtocolHandler::on_connection_synchronized() {
   bool val_expected = false;
   if (m_synchronized.compare_exchange_strong(val_expected, true)) {
     logger(Logging::INFO) << ENDL << "**********************************************************************" << ENDL
-      << "You are now synchronized with the network. You may now start simplewallet." << ENDL
+      << "You are now synchronized with the SPOTme Coin network. You may now start simplewallet." << ENDL
       << ENDL
       << "Please note, that the blockchain will be saved only after you quit the daemon with \"exit\" command or if you use \"save\" command." << ENDL
-      << "Otherwise, you will possibly need to synchronize the blockchain again." << ENDL
+      << "Otherwise, you will possibly need to synchronize the blockchain again. Chat with us on Discord -- http://chat.spotmecoin.com" << ENDL
       << ENDL
       << "Use \"help\" command to see the list of available commands." << ENDL
       << "**********************************************************************";

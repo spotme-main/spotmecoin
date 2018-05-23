@@ -1501,8 +1501,9 @@ std::vector<uint32_t> DatabaseBlockchainCache::getRandomOutsByAmount(uint64_t am
     globalIndexes.reserve(outputsToPick);
 
     try {
-      for (uint32_t i = 0, j = 0; i < outputsToPick; )  {
-        globalIndexes.push_back(generator());
+      for (uint32_t i = 0; i < outputsToPick; ++i, globalIndexes.push_back(generator())) { }
+/*      for (uint32_t i = 0, j = 0; i < outputsToPick; )  {
+     globalIndexes.push_back(generator());
         std::vector<uint32_t> lastIndexVector;
         lastIndexVector.push_back(globalIndexes.back());
         std::vector<PackedOutIndex> outputs;
@@ -1521,7 +1522,8 @@ std::vector<uint32_t> DatabaseBlockchainCache::getRandomOutsByAmount(uint64_t am
         } else {
           ++i;
         }
-      }
+
+      }*/
       //std::generate_n(std::back_inserter(globalIndexes), outputsToPick, generator);
     } catch (const SequenceEnded&) {
       logger(Logging::TRACE) << "getRandomOutsByAmount: generator reached sequence end";

@@ -94,8 +94,12 @@ bool Currency::generateGenesisBlock() {
   //std::string hex_tx_represent = Common::toHex(txb);
 
   // Hard code coinbase tx in genesis block, because through generating tx use random, but genesis should be always the same
-  std::string genesisCoinbaseTxHex = m_genesisCoinbaseTxHex;
+  std::string genesisCoinbaseTxHex = "010a01ff0001c0f5d1f0faa8b8bd5402346d1a3b284587e258c5451eff42b2a439c579c9cc09920897a724381cf2013f2101580d020343890753091d1146a2afaf6b412c1151ad7bcb2db23e0e3a156119bf";
   BinaryArray minerTxBlob;
+
+ // logger(INFO) << "Opening Database";
+ // logger(INFO) << "genesisCoinBaseTX: " << m_genesisCoinbaseTxHex;
+ // logger(INFO) << "genesisCoinBaseTX: " << genesisCoinbaseTxHex;
 
   bool r =
     fromHex(genesisCoinbaseTxHex, minerTxBlob) &&
@@ -167,6 +171,8 @@ uint32_t Currency::upgradeHeight(uint8_t majorVersion) const {
     return m_upgradeHeightV2;
   } else if (majorVersion == BLOCK_MAJOR_VERSION_3) {
     return m_upgradeHeightV3;
+  } else if (majorVersion == BLOCK_MAJOR_VERSION_4) {
+    return m_upgradeHeightV4;
   } else {
     return static_cast<uint32_t>(-1);
   }
@@ -604,7 +610,12 @@ std::vector<uint64_t> cumulativeDifficulties_o(cumulativeDifficulties);
       return 0;
     }
     uint64_t nextDiffZ = low / timeSpan;
-
+ if (nextDiffZ <= 100) {
+      nextDiffZ = 100;
+    }
+    return nextDiffZ;
+  }
+/*
     return nextDiffZ;
   }
 
@@ -613,12 +624,12 @@ std::vector<uint64_t> cumulativeDifficulties_o(cumulativeDifficulties);
     if (high != 0) {
       return 0;
     }
-/*
-  Recalculating 'low' and 'timespan' with hardcoded values:
-  DIFFICULTY_CUT=0
-  DIFFICULTY_LAG=0
-  DIFFICULTY_WINDOW=17
-*/
+
+//  Recalculating 'low' and 'timespan' with hardcoded values:
+//  DIFFICULTY_CUT=0
+//  DIFFICULTY_LAG=0
+//  DIFFICULTY_WINDOW=17
+
     c_difficultyWindow = 17;
     c_difficultyCut = 0;
 
@@ -646,7 +657,7 @@ std::vector<uint64_t> cumulativeDifficulties_o(cumulativeDifficulties);
       cutBegin = (length - (c_difficultyWindow - 2 * c_difficultyCut) + 1) / 2;
       cutEnd = cutBegin + (c_difficultyWindow - 2 * c_difficultyCut);
     }
-    assert(/*cut_begin >= 0 &&*/ cutBegin + 2 <= cutEnd && cutEnd <= length);
+    assert( cutBegin + 2 <= cutEnd && cutEnd <= length);
     timeSpan = timestamps[cutEnd - 1] - timestamps[cutBegin];
     if (timeSpan == 0) {
       timeSpan = 1;
@@ -663,7 +674,7 @@ std::vector<uint64_t> cumulativeDifficulties_o(cumulativeDifficulties);
 
     return nextDiffZ;
   }
-
+*/
   return (low + timeSpan - 1) / timeSpan;  // with version
 }
 
@@ -714,6 +725,7 @@ bool Currency::checkProofOfWork(Crypto::cn_context& context, const CachedBlock& 
 
   case BLOCK_MAJOR_VERSION_2:
   case BLOCK_MAJOR_VERSION_3:
+  case BLOCK_MAJOR_VERSION_4:
     return checkProofOfWorkV2(context, block, currentDiffic);
   }
 
@@ -757,6 +769,7 @@ m_moneySupply(currency.m_moneySupply),
 m_emissionSpeedFactor(currency.m_emissionSpeedFactor),
 m_rewardBlocksWindow(currency.m_rewardBlocksWindow),
 m_blockGrantedFullRewardZone(currency.m_blockGrantedFullRewardZone),
+m_isBlockexplorer(currency.m_isBlockexplorer),
 m_expectedNumberOfBlocksPerDay(currency.m_expectedNumberOfBlocksPerDay),
 m_blockGrantedFullRewardZoneV1(currency.m_blockGrantedFullRewardZoneV1),
 m_blockGrantedFullRewardZoneV2(currency.m_blockGrantedFullRewardZoneV2),
@@ -789,6 +802,7 @@ m_fusionTxMinInputCount(currency.m_fusionTxMinInputCount),
 m_fusionTxMinInOutCountRatio(currency.m_fusionTxMinInOutCountRatio),
 m_upgradeHeightV2(currency.m_upgradeHeightV2),
 m_upgradeHeightV3(currency.m_upgradeHeightV3),
+m_upgradeHeightV4(currency.m_upgradeHeightV4),
 m_upgradeVotingThreshold(currency.m_upgradeVotingThreshold),
 m_upgradeVotingWindow(currency.m_upgradeVotingWindow),
 m_upgradeWindow(currency.m_upgradeWindow),
@@ -874,6 +888,7 @@ fusionTxMaxSize(parameters::MAX_TRANSACTION_SIZE_LIMIT * 30 / 100);
     keyImageCheckingBlockIndex(parameters::KEY_IMAGE_CHECKING_BLOCK_INDEX);
   upgradeHeightV2(parameters::UPGRADE_HEIGHT_V2);
   upgradeHeightV3(parameters::UPGRADE_HEIGHT_V3);
+  upgradeHeightV4(parameters::UPGRADE_HEIGHT_V4);
   upgradeVotingThreshold(parameters::UPGRADE_VOTING_THRESHOLD);
   upgradeVotingWindow(parameters::UPGRADE_VOTING_WINDOW);
   upgradeWindow(parameters::UPGRADE_WINDOW);
@@ -882,6 +897,7 @@ fusionTxMaxSize(parameters::MAX_TRANSACTION_SIZE_LIMIT * 30 / 100);
   blockIndexesFileName(parameters::CRYPTONOTE_BLOCKINDEXES_FILENAME);
   txPoolFileName(parameters::CRYPTONOTE_POOLDATA_FILENAME);
 
+    isBlockexplorer(false);
   testnet(false);
 }
 

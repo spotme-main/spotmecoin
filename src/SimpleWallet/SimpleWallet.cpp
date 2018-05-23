@@ -92,6 +92,7 @@ const command_line::arg_descriptor<uint32_t> arg_log_level = { "set_log", "", IN
   const command_line::arg_descriptor<uint64_t>    arg_EXPECTED_NUMBER_OF_BLOCKS_PER_DAY  = {"EXPECTED_NUMBER_OF_BLOCKS_PER_DAY", "uint64_t"};
   const command_line::arg_descriptor<uint32_t>    arg_UPGRADE_HEIGHT_V2  = {"UPGRADE_HEIGHT_V2", "uint32_t", 0};
   const command_line::arg_descriptor<uint32_t>    arg_UPGRADE_HEIGHT_V3  = {"UPGRADE_HEIGHT_V3", "uint32_t", 0};
+  const command_line::arg_descriptor<uint32_t>    arg_UPGRADE_HEIGHT_V4 = { "UPGRADE_HEIGHT_V4", "uint32_t", 0 };
   const command_line::arg_descriptor<uint32_t>    arg_KEY_IMAGE_CHECKING_BLOCK_INDEX  = {"KEY_IMAGE_CHECKING_BLOCK_INDEX", "uint32_t", 0};
   const command_line::arg_descriptor<size_t>      arg_DIFFICULTY_WINDOW_V1  = {"DIFFICULTY_WINDOW_V1", "size_t", 0};
   const command_line::arg_descriptor<size_t>      arg_DIFFICULTY_WINDOW_V2  = {"DIFFICULTY_WINDOW_V2", "size_t", 0};
@@ -722,7 +723,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     m_wallet->addObserver(this);
     m_node->addObserver(static_cast<INodeObserver*>(this));
 
-    logger(INFO, BRIGHT_WHITE) << "Opened wallet: " << m_wallet->getAddress();
+    logger(INFO, BRIGHT_WHITE) << "Opened SPOTme wallet: " << m_wallet->getAddress();
 
     success_msg_writer() <<
       "**********************************************************************\n" <<
@@ -1267,6 +1268,7 @@ int main(int argc, char* argv[]) {
   command_line::add_arg(desc_params, arg_EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);
   command_line::add_arg(desc_params, arg_UPGRADE_HEIGHT_V2);
   command_line::add_arg(desc_params, arg_UPGRADE_HEIGHT_V3);
+  command_line::add_arg(desc_params, arg_UPGRADE_HEIGHT_V4);
   command_line::add_arg(desc_params, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX);
   command_line::add_arg(desc_params, arg_DIFFICULTY_WINDOW);
   command_line::add_arg(desc_params, arg_DIFFICULTY_CUT);
@@ -1389,6 +1391,10 @@ int main(int argc, char* argv[]) {
   if (command_line::has_arg(vm, arg_UPGRADE_HEIGHT_V3) && command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V3) != 0)
   {
     currencyBuilder.upgradeHeightV3(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V3));
+  }
+  if (command_line::has_arg(vm, arg_UPGRADE_HEIGHT_V4) && command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4) != 0)
+  {
+	  currencyBuilder.upgradeHeightV4(command_line::get_arg(vm, arg_UPGRADE_HEIGHT_V4));
   }
   if (command_line::has_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX) && command_line::get_arg(vm, arg_KEY_IMAGE_CHECKING_BLOCK_INDEX) != 0)
   {

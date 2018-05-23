@@ -36,7 +36,7 @@
 #include <System/Ipv4Resolver.h>
 #include <System/TcpListener.h>
 #include <System/TcpConnector.h>
- 
+
 #include "version.h"
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
@@ -221,7 +221,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
   void NodeServer::serialize(ISerializer& s) {
     uint8_t version = 1;
     s(version, "version");
-    
+
     if (version != 1) {
       throw std::runtime_error("Unsupported version");
     }
@@ -265,7 +265,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
 #undef INVOKE_HANDLER
 
   //-----------------------------------------------------------------------------------
-  
+
   void NodeServer::init_options(boost::program_options::options_description& desc)
   {
     command_line::add_arg(desc, arg_p2p_bind_ip);
@@ -275,11 +275,11 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     command_line::add_arg(desc, arg_p2p_add_peer);
     command_line::add_arg(desc, arg_p2p_add_priority_node);
     command_line::add_arg(desc, arg_p2p_add_exclusive_node);
-    command_line::add_arg(desc, arg_p2p_seed_node);    
+    command_line::add_arg(desc, arg_p2p_seed_node);
     command_line::add_arg(desc, arg_p2p_hide_my_port);
   }
   //-----------------------------------------------------------------------------------
-  
+
   bool NodeServer::init_config() {
     try {
       std::string state_file_path = m_config_folder + "/" + m_p2p_state_filename;
@@ -320,7 +320,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     return true;
   }
 
-  //----------------------------------------------------------------------------------- 
+  //-----------------------------------------------------------------------------------
   void NodeServer::for_each_connection(std::function<void(CryptoNoteConnectionContext&, PeerIdType)> f)
   {
     for (auto& ctx : m_connections) {
@@ -328,7 +328,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     }
   }
 
-  //----------------------------------------------------------------------------------- 
+  //-----------------------------------------------------------------------------------
   void NodeServer::externalRelayNotifyToAll(int command, const BinaryArray& data_buff) {
     m_dispatcher.remoteSpawn([this, command, data_buff] {
       relay_notify_to_all(command, data_buff, nullptr);
@@ -342,9 +342,9 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     logger(INFO, BRIGHT_WHITE) << "Generated new peer ID: " << m_config.m_peer_id;
     return true;
   }
-  
+
   //-----------------------------------------------------------------------------------
-  
+
   bool NodeServer::handle_command_line(const boost::program_options::variables_map& vm)
   {
     m_bind_ip = command_line::get_arg(vm, arg_p2p_bind_ip);
@@ -353,7 +353,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     m_allow_local_ip = command_line::get_arg(vm, arg_p2p_allow_local_ip);
 
     if (command_line::has_arg(vm, arg_p2p_add_peer))
-    {       
+    {
       std::vector<std::string> perrs = command_line::get_arg(vm, arg_p2p_add_peer);
       for(const std::string& pr_str: perrs)
       {
@@ -415,7 +415,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
       logger(ERROR, BRIGHT_RED) << "Failed to parse seed address from string: '" << addr << '\'';
       return false;
     }
-    
+
     std::string host = addr.substr(0, pos);
 
     try {
@@ -437,7 +437,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
 
 
   //-----------------------------------------------------------------------------------
-  
+
   bool NodeServer::init(const NetNodeConfig& config) {
     if (!config.getTestnet() && config.getSeedNodes().size() == 0) {
       for (auto seed : CryptoNote::SEED_NODES) {
@@ -455,22 +455,25 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     m_p2p_state_filename = config.getP2pStateFilename();
 
     if (!init_config()) {
-      logger(ERROR, BRIGHT_RED) << "Failed to init config."; 
-      return false; 
+      logger(ERROR, BRIGHT_RED) << "Failed to init config.";
+      return false;
     }
 
-    if (!m_peerlist.init(m_allow_local_ip)) { 
-      logger(ERROR, BRIGHT_RED) << "Failed to init peerlist."; 
-      return false; 
+    if (!m_peerlist.init(m_allow_local_ip)) {
+      logger(ERROR, BRIGHT_RED) << "Failed to init peerlist.";
+      return false;
     }
 
     for(auto& p: m_command_line_peers)
       m_peerlist.append_with_peer_white(p);
-    
+
     //only in case if we really sure that we have external visible ip
     m_have_address = true;
     m_ip_address = 0;
+
+#ifdef ALLOW_DEBUG_COMMANDS
     m_last_stat_request_time = 0;
+#endif 
 
     //configure self
     // m_net_server.get_config_object().m_pcommands_handler = this;
