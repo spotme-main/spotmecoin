@@ -1,3 +1,9 @@
+Release notes 2.1.4.1272
+- Public release of SPOTme Coin source code
+- Added CryptoNight-lite variant 1 
+- Hard fork to occur at block 87000
+- added user friendly error messages
+
 Release notes 2.1.2
 
 - Updated crawler public key
