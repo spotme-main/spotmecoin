@@ -12,9 +12,9 @@ Step by step Windows instructions:
 https://github.com/forknote/cryptonote-generator/blob/master/docs/windows-requirements-install.md
 
 Ubuntu (tested on Ubuntu 16.04) / Mac dependencies:
-...
+```
 sudo apt-get install build-essential python-dev autotools-dev libicu-dev libbz2-dev  libcurl4-openssl-dev git qt-sdk libminiupnpc-dev miniupnpc libdb-dev libdb++-dev libssl-dev bzip2-doc cmake
-...
+```
 
 ### Usage
 1. Download or compile the binaries
