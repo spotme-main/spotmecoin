@@ -1,6 +1,6 @@
 
 ### About
-SPOTme Coin is a cryptonote-based cryptocurrency.  Besides being just plain awesome, it is now ASIC resistant with the CN-lite Varient 1 algorithm.  
+SPOTme Coin is a cryptonote-based cryptocurrency.  Besides being just plain awesome, it is now ASIC resistant with the CN-lite Variant 1 algorithm.  
 
 ### Dependencies
 * GCC 4.7.3 or later     (http://gcc.gnu.org/)
