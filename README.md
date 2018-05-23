@@ -13,7 +13,7 @@ https://github.com/forknote/cryptonote-generator/blob/master/docs/windows-requir
 
 Ubuntu (tested on Ubuntu 16.04) / Mac dependencies:
 ```
-sudo apt-get install build-essential python-dev autotools-dev libicu-dev libbz2-dev  libcurl4-openssl-dev git qt-sdk libminiupnpc-dev miniupnpc libdb-dev libdb++-dev libssl-dev bzip2-doc cmake
+sudo apt-get install build-essential python-dev autotools-dev libicu-dev libbz2-dev  libcurl4-openssl-dev git qt-sdk libminiupnpc-dev miniupnpc libdb-dev libdb++-dev libssl-dev bzip2-doc cmake libboost-all-dev 
 ```
 
 ### Usage
